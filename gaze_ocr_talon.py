@@ -264,7 +264,7 @@ def reload_backend(name, flags):
         )
     else:
         if setting_ocr_use_talon_backend and not ocr:
-            logging.info("Talon OCR not available, will rely on 3rd party library.")
+            logging.info("Talon OCR not available, will rely on external support.")
         ocr_reader = screen_ocr.Reader.create_fast_reader(
             radius=settings.get("user.ocr_gaze_point_padding"), homophones=homophones,
         tesseract_data_path = r"/usr/share/tesseract-ocr/4.00/tessdata",    tesseract_command = r"/usr/bin/tesseract"
