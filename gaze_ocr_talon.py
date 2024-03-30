@@ -166,6 +166,8 @@ default_punctuation_words = {
     # Currencies
     "dollar sign": "$",
     "pound sign": "£",
+    "hyphen": "-",
+    "underscore": "_",
 }
 
 
@@ -282,12 +284,16 @@ def reset_disambiguation():
     global ambiguous_matches, disambiguation_generator, disambiguation_canvas, debug_canvas
     ambiguous_matches = None
     disambiguation_generator = None
+    hide_canvas = disambiguation_canvas or debug_canvas
     if disambiguation_canvas:
         disambiguation_canvas.close()
     disambiguation_canvas = None
     if debug_canvas:
         debug_canvas.close()
     debug_canvas = None
+    if hide_canvas:
+        # Ensure that the canvas doesn't interfere with subsequent screenshots.
+        actions.sleep("10ms")
 
 
 def show_disambiguation():
@@ -695,6 +701,7 @@ class GazeOcrActions:
         """Displays overlay over primary screen.
 
         Reads nearby gaze when the near parameter is spoken."""
+        reset_disambiguation()
         if near:
             gaze_ocr_controller.read_nearby((near.start, near.end))
         else:
@@ -711,6 +718,17 @@ class GazeOcrActions:
         def on_draw(c):
             debug_color = (
                 "000000" if has_light_background(contents.screenshot) else "ffffff"
+            )
+            # Show bounding box.
+            c.paint.style = c.paint.Style.STROKE
+            c.paint.color = debug_color
+            c.draw_rect(
+                rect.Rect(
+                    x=contents.bounding_box[0],
+                    y=contents.bounding_box[1],
+                    width=contents.bounding_box[2] - contents.bounding_box[0],
+                    height=contents.bounding_box[3] - contents.bounding_box[1],
+                )
             )
             if contents.screen_coordinates:
                 c.paint.style = c.paint.Style.STROKE
